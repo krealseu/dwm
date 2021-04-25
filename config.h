@@ -47,7 +47,7 @@ static const Rule rules[] = {
 	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
 	{ "Firefox",  NULL,       NULL,       0,            0,           -1 }, 
 	{ "Steam",    NULL,       NULL,       1<<7,         0,           -1 }, 
-	{ "Dota2",    NULL,       NULL,       1<<6,         0,           -1 }, 
+	/* { "Dota2",    NULL,       NULL,       1<<6,         0,           -1 }, */
 };
 
 /* layout(s) */
@@ -86,7 +86,7 @@ static const char *wpcmd[] = { "/bin/bash", "/home/anemone/Documents/scripts/wp-
 
 // static const char *termcmd[]  = { "st", NULL };
 static const char *termcmd[]  = { "alacritty", NULL };
-static const char *slockcmd[]  = { "slock", NULL };
+static const char *slockcmd[]  = { "slock", "-m" , "克己" ,NULL };
 static const char *tgtrayer[]  = { "/bin/bash", "/home/anemone/Documents/scripts/tg-trayer.sh",NULL };
 static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
