@@ -34,6 +34,18 @@ static const unsigned int alphas[][3]      = {
 	[SchemeSel]  = { OPAQUE, baralpha, borderalpha },
 };
 
+typedef struct {
+	const char *name;
+	const void *cmd;
+} Sp;
+const char *spcmd1[] = {"st", "-n", "scratchpad", "-g", "120x34", "-e", "fish", NULL };
+const char *spcmd2[] = {"dolphin", NULL };
+static Sp scratchpads[] = {
+	/* name          cmd  */
+	{"scratchpad",      spcmd1},
+	{"dolphin",    spcmd2},
+};
+
 /* tagging */
 // static const char *tags[] = { "一", "二", "三", "四", "五", "六", "七", "八", "九" };
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
@@ -45,9 +57,14 @@ static const Rule rules[] = {
 	 */
 	/* class      instance    title       tags mask     isfloating   monitor */
 	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
+	{ NULL,   "Godot_Engine", NULL,       0,            1,           -1 },
 	{ "Firefox",  NULL,       NULL,       0,            0,           -1 }, 
 	{ "Steam",    NULL,       NULL,       1<<7,         0,           -1 }, 
-	/* { "Dota2",    NULL,       NULL,       1<<6,         0,           -1 }, */
+	{ "dota2",    NULL,       NULL,       1<<6,         0,           -1 }, 
+	{ "Code",	  "code",     NULL,       1<<1,         0,           -1 }, 
+	{ "File-roller","file-roller",NULL,   0,            1,           -1 }, 
+	{ NULL, "scratchpad",	  NULL,		  SPTAG(0),		1,			 -1 },
+	{ "dolphin","dolphin",    NULL,       SPTAG(1),     1,           -1 }, 
 };
 
 /* layout(s) */
@@ -83,13 +100,13 @@ static const char *mutevol[] = { "/bin/bash", "/home/anemone/Documents/scripts/v
 static const char *upbtn[] = { "/bin/bash", "/home/anemone/Documents/scripts/brightness-up.sh", NULL };
 static const char *downbtn[] = { "/bin/bash", "/home/anemone/Documents/scripts/brightness-down.sh", NULL };
 static const char *wpcmd[] = { "/bin/bash", "/home/anemone/Documents/scripts/wp-change.sh",  NULL };
+static const char *one_screen[] = { "/bin/bash", "/home/anemone/Documents/scripts/one_screen.sh",  NULL };
 
 // static const char *termcmd[]  = { "st", NULL };
 static const char *termcmd[]  = { "alacritty", NULL };
+static const char *nemo[]  = { "dolphin", NULL };
 static const char *slockcmd[]  = { "slock", "-m" , "克己" ,NULL };
 static const char *tgtrayer[]  = { "/bin/bash", "/home/anemone/Documents/scripts/tg-trayer.sh",NULL };
-static const char scratchpadname[] = "scratchpad";
-static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
 static const char *screenshotcmd[] = { "flameshot", "gui", NULL };
 
 static Key keys[] = {
@@ -100,13 +117,14 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_t,      spawn,          {.v = tgtrayer } },
 	{ MODKEY|ControlMask,           XK_l,      spawn,          {.v = slockcmd } },
 	{ MODKEY,                       XK_b,      spawn,          {.v = wpcmd    } },
-	{ MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } },
+	{ MODKEY,                       XK_grave,  togglescratch,  {.ui = 0 } },
 	/* { MODKEY,                       XK_b,      togglebar,      {0} }, */
 	{ 0,           XF86XK_MonBrightnessUp,     spawn,          {.v = upbtn    } },
 	{ 0,           XF86XK_MonBrightnessDown,   spawn,          {.v = downbtn  } },
 	{ 0,           XF86XK_AudioLowerVolume,    spawn,          {.v = downvol  } },
 	{ 0,           XF86XK_AudioMute,           spawn,          {.v = mutevol  } },
 	{ 0,           XF86XK_AudioRaiseVolume,    spawn,          {.v = upvol    } },
+	{ 0,           XF86XK_Display,             spawn,          {.v = one_screen    } },
 	{ 0,                            XK_Print,  spawn,          {.v = screenshotcmd } },
 	/* { MODKEY,              XK_bracketleft,          spawn,          {.v = tgtrayer } }, */
 	/* { MODKEY,              XK_backslash,            spawn,          {.v = tgtrayer } }, */
@@ -127,14 +145,16 @@ static Key keys[] = {
 	{ MODKEY,                       XK_Tab,    view,           {0} },
 	{ Mod1Mask,                     XK_Tab,    focusstackhid,  {.i = +1 } },
 	{ Mod1Mask|ShiftMask,           XK_Tab,    rotatestack,    {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_Tab,    rotatestack,    {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0} },
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
 	/* { MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} }, */
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
 	/* { MODKEY|ShiftMask,             XK_f,      fullscreen,     {0} }, */
+	{ MODKEY,                       XK_f,      togglescratch,  { .ui = 1 } },
+	{ MODKEY|ShiftMask,             XK_f,      togglefullscr,  {0} },
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
-	{ MODKEY|ShiftMask,             XK_f,      togglefullscr,  {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
 	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
