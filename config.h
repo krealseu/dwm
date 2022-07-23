@@ -5,22 +5,22 @@
 /* appearance */
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
-static const unsigned int gappih    = 10;       /* horiz inner gap between windows */
-static const unsigned int gappiv    = 10;       /* vert inner gap between windows */
-static const unsigned int gappoh    = 10;       /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov    = 10;       /* vert outer gap between windows and screen edge */
+static const unsigned int gappih    = 8;       /* horiz inner gap between windows */
+static const unsigned int gappiv    = 8;       /* vert inner gap between windows */
+static const unsigned int gappoh    = 8;       /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov    = 8;       /* vert outer gap between windows and screen edge */
 static const int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
 static const int showbar            = 1;        /* 0 means no bar */
-static const int topbar             = 0;        /* 0 means bottom bar */
+static const int topbar             = 1;        /* 0 means bottom bar */
 static const Bool viewontag         = True;     /* Switch view on tag switch */
 static const char *fonts[]          = { "Source Code Pro:size=14" };
 static const char dmenufont[]       = "Source Code Pro:size=14";
-static const char col_gray1[]       = "#222222";
+static const char col_gray1[]       = "#202020";
 static const char col_gray2[]       = "#444444";
-static const char col_gray3[]       = "#bbbbbb";
-static const char col_gray4[]       = "#eeeeee";
-static const char col_cyan[]        = "#374747";
-static const unsigned int baralpha = 0xd0;
+static const char col_gray3[]       = "#e9e8e9";
+static const char col_gray4[]       = "#dddddd";
+static const char col_cyan[]        = "#3a3a3a";
+static const unsigned int baralpha = 0xe0;
 static const unsigned int borderalpha = OPAQUE;
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
@@ -57,6 +57,7 @@ static const Rule rules[] = {
 	 */
 	/* class      instance    title       tags mask     isfloating   monitor */
 	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
+	{  "feh",    "feh",       NULL,       0,            1,           -1 },
 	{ NULL,   "Godot_Engine", NULL,       0,            1,           -1 },
 	{ "Firefox",  NULL,       NULL,       0,            0,           -1 }, 
 	{ "Steam",    NULL,       NULL,       1<<7,         0,           -1 }, 
@@ -74,9 +75,11 @@ static const int resizehints = 1;    /* 1 means respect size hints in tiled resi
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	{ "Tile",      tile },    /* first entry is default */
-	{ "><>",      NULL },    /* no layout function means floating behavior */
+	{ "[]=",      tile },    /* first entry is default */
+	// { "><>",      NULL },    /* no layout function means floating behavior */
 	{ "[M]",      monocle },
+	{ "Grid",      gaplessgrid },
+	{ NULL,       NULL },
 };
 
 /* key definitions */
@@ -92,7 +95,8 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
+// static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
+static const char *dmenucmd[] = { "rofi", "-show", "drun", NULL };
 
 static const char *upvol[]   = { "/bin/bash", "/home/anemone/Documents/scripts/vol-up.sh",  NULL };
 static const char *downvol[] = { "/bin/bash", "/home/anemone/Documents/scripts/vol-down.sh",  NULL };
@@ -101,6 +105,8 @@ static const char *upbtn[] = { "/bin/bash", "/home/anemone/Documents/scripts/bri
 static const char *downbtn[] = { "/bin/bash", "/home/anemone/Documents/scripts/brightness-down.sh", NULL };
 static const char *wpcmd[] = { "/bin/bash", "/home/anemone/Documents/scripts/wp-change.sh",  NULL };
 static const char *one_screen[] = { "/bin/bash", "/home/anemone/Documents/scripts/one_screen.sh",  NULL };
+static const char *xmenu_cmd[] = { "/bin/bash", "/home/anemone/Documents/scripts/xmenu_cmd.sh",  NULL };
+static const char *layoutmenu_cmd = "/home/anemone/Documents/scripts/layoutmenu.sh";
 
 // static const char *termcmd[]  = { "st", NULL };
 static const char *termcmd[]  = { "alacritty", NULL };
@@ -172,15 +178,16 @@ static Key keys[] = {
 	TAGKEYS(                        XK_7,                      6)
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
-	{ MODKEY|ShiftMask|ControlMask,             XK_q,      quit,           {0} },
+	{ MODKEY|ShiftMask|ControlMask,             XK_Delete,      quit,           {0} },
 };
 
 /* button definitions */
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
 static Button buttons[] = {
 	/* click                event mask      button          function        argument */
-	{ ClkLtSymbol,          0,              Button1,        setlayout,      {0} },
-	{ ClkLtSymbol,          0,              Button3,        setlayout,      {.v = &layouts[2]} },
+	{ ClkLtSymbol,          0,              Button3,        setlayout,      {0} },
+	// { ClkLtSymbol,          0,              Button3,        setlayout,      {.v = &layouts[2]} },
+	{ ClkLtSymbol,          0,              Button1,        spawn,          {.v = xmenu_cmd } },
 	{ ClkWinTitle,          0,              Button1,        togglewin,      {0} },
 	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
 	{ ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
